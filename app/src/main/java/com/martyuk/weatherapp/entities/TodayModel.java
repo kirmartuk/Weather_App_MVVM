@@ -1,17 +1,55 @@
-package com.martyuk.weatherapp.ui.main.today;
+package com.martyuk.weatherapp.entities;
+
+import java.util.List;
+
 
 public class TodayModel {
     String timeStamp;
     int temperature;
     int imageResource;
+    int feelsLike;
+    List<WeatherHourlyModel> hourly;
+
+    public List<WeatherHourlyModel> getHourly() {
+        return hourly;
+    }
 
     @Override
     public String toString() {
         return "TodayModel{" +
                 "timeStamp='" + timeStamp + '\'' +
                 ", temperature=" + temperature +
-                ", image=" + imageResource +
+                ", imageResource=" + imageResource +
+                ", feelsLike=" + feelsLike +
+                ", hourly=" + hourly +
                 '}';
+    }
+
+    public int getFeelsLike() {
+        return feelsLike;
+    }
+
+    public void setFeelsLike(int feelsLike) {
+        this.feelsLike = feelsLike;
+    }
+
+    public void setHourly(List<WeatherHourlyModel> hourly) {
+        this.hourly = hourly;
+    }
+
+    public TodayModel(String timeStamp, int temperature, int imageResource, int feelsLike, List<WeatherHourlyModel> hourly) {
+        this.timeStamp = timeStamp;
+        this.temperature = temperature;
+        this.imageResource = imageResource;
+        this.feelsLike = feelsLike;
+        this.hourly = hourly;
+    }
+
+    public TodayModel(String timeStamp, int temperature, int imageResource, List<WeatherHourlyModel> hourly) {
+        this.timeStamp = timeStamp;
+        this.temperature = temperature;
+        this.imageResource = imageResource;
+        this.hourly = hourly;
     }
 
     public TodayModel(String timeStamp, int temperature, int imageResource) {

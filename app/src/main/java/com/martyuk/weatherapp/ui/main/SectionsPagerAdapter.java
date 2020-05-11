@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import com.martyuk.weatherapp.R;
 import com.martyuk.weatherapp.ui.main.today.TodayFragment;
 import com.martyuk.weatherapp.ui.main.tomorrow.TomorrowFragment;
+import com.martyuk.weatherapp.ui.main.week.WeekFragment;
 
 /**
  * A [FragmentPagerAdapter] that returns a fragment corresponding to
@@ -29,15 +30,14 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        // getItem is called to instantiate the fragment for the given page.
-        // Return a PlaceholderFragment (defined as a static inner class below).
-        switch (position){
-            case 0:
+        switch (position) {
+            case 1:
+                return new TomorrowFragment();
+            case 2:
+                return new WeekFragment();
+            default:
                 return new TodayFragment();
-            case 1 :
-                return  new TomorrowFragment() ;
         }
-        return PlaceholderFragment.newInstance(position + 1);
     }
 
     @Nullable

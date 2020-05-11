@@ -3,14 +3,16 @@ package com.martyuk.weatherapp.entities;
 public class WeatherHourlyModel {
     int temperature;
     int imageResource;
-    String time;
+    long time;
+    String timeZone;
 
     @Override
     public String toString() {
-        return "TodayWeatherHourlyModel{" +
+        return "WeatherHourlyModel{" +
                 "temperature=" + temperature +
                 ", imageResource=" + imageResource +
-                ", time='" + time + '\'' +
+                ", time=" + time +
+                ", timeZone='" + timeZone + '\'' +
                 '}';
     }
 
@@ -30,17 +32,29 @@ public class WeatherHourlyModel {
         this.imageResource = imageResource;
     }
 
-    public String getTime() {
+    public long getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(long time) {
         this.time = time;
     }
 
-    public WeatherHourlyModel(int temperature, int imageResource, String time) {
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
+    }
+
+    public WeatherHourlyModel() {
+    }
+
+    public WeatherHourlyModel(int temperature, int imageResource, long time, String timeZone) {
         this.temperature = temperature;
         this.imageResource = imageResource;
         this.time = time;
+        this.timeZone = timeZone;
     }
 }
