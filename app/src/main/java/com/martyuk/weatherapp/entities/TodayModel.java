@@ -9,6 +9,7 @@ public class TodayModel {
     int imageResource;
     int feelsLike;
     List<WeatherHourlyModel> hourly;
+    String description;
 
     public List<WeatherHourlyModel> getHourly() {
         return hourly;
@@ -22,6 +23,7 @@ public class TodayModel {
                 ", imageResource=" + imageResource +
                 ", feelsLike=" + feelsLike +
                 ", hourly=" + hourly +
+                ", description='" + description + '\'' +
                 '}';
     }
 
@@ -37,12 +39,26 @@ public class TodayModel {
         this.hourly = hourly;
     }
 
-    public TodayModel(String timeStamp, int temperature, int imageResource, int feelsLike, List<WeatherHourlyModel> hourly) {
+    public TodayModel(String timeStamp,
+                      int temperature,
+                      int imageResource,
+                      int feelsLike,
+                      List<WeatherHourlyModel> hourly,
+                      String description) {
         this.timeStamp = timeStamp;
         this.temperature = temperature;
         this.imageResource = imageResource;
         this.feelsLike = feelsLike;
         this.hourly = hourly;
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public TodayModel(String timeStamp, int temperature, int imageResource, List<WeatherHourlyModel> hourly) {

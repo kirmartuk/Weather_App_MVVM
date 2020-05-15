@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,7 +15,9 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.martyuk.weatherapp.MainViewModel;
 import com.martyuk.weatherapp.R;
 import com.martyuk.weatherapp.WeatherHourlyRecyclerViewAdapter;
 
@@ -32,7 +33,7 @@ public class TodayFragment extends Fragment {
     TextView temperature;
     @BindView(R.id.fragment_today_timeUpdate)
     TextView timeUpdate;
-    @BindView(R.id.fragment_today_sunImage)
+    @BindView(R.id.fragment_today_image)
     ImageView sunImage;
     @BindView(R.id.fragment_today_current_hourly)
     RecyclerView currentHourly;
@@ -40,8 +41,10 @@ public class TodayFragment extends Fragment {
     TextView feelsLike;
     @BindView(R.id.fragment_today_temperature_sign)
     TextView sign;
-    @BindView(R.id.today_progressBar)
-    ProgressBar progressBar;
+    @BindView(R.id.fragment_today_description)
+    TextView description;
+    @BindView(R.id.today)
+    SwipeRefreshLayout swipeRefreshLayout;
 
     private WeatherHourlyRecyclerViewAdapter adapter;
 
@@ -51,22 +54,23 @@ public class TodayFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_today, container, false);
         ButterKnife.bind(this, root);
-        TodayViewModel model = ViewModelProviders.of(getActivity()).get(TodayViewModel.class);
-        model.progressBar.observe(getViewLifecycleOwner(), progress -> {
-            Log.e("progress", progress.toString());
-            if (progress) {
-                progressBar.setVisibility(View.VISIBLE);
-            } else {
-                progressBar.setVisibility(View.GONE);
-            }
-        });
-        model.getModel().observe(getViewLifecycleOwner(), model1 -> {
+        TodayViewModel todayViewModel = ViewModelProviders.of(getActivity()).get(TodayViewModel.class);
+        //swipe fragment to update weather
+        swipeRefreshLayout.setOnRefreshListener(todayViewModel::loadCurrentWeather);
+
+        todayViewModel.getProgress().observe(getViewLifecycleOwner(),
+                progress -> swipeRefreshLayout.setRefreshing(progress));
+
+        todayViewModel.getModel().observe(getViewLifecycleOwner(), model1 -> {
             Log.e("model", model1.toString());
+
             temperature.setText(String.valueOf(model1.getTemperature()));
             timeUpdate.setText(model1.getTimeStamp());
             sunImage.setImageResource(model1.getImageResource());
             feelsLike.setText(getString(R.string.feels_like) + " " + model1.getFeelsLike());
             sign.setText((units.equals("metric") ? "°C" : "°F"));
+            description.setText(model1.getDescription());
+            swipeRefreshLayout.setRefreshing(false);
 
             adapter = new WeatherHourlyRecyclerViewAdapter(model1.getHourly());
             LinearLayoutManager mLayoutManager = new LinearLayoutManager(root.getContext());
@@ -74,6 +78,11 @@ public class TodayFragment extends Fragment {
             currentHourly.setLayoutManager(mLayoutManager);
             currentHourly.setItemAnimator(new DefaultItemAnimator());
             currentHourly.setAdapter(adapter);
+
+            //update city name
+            MainViewModel mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+            mainViewModel.loadCity();
+
 
         });
 

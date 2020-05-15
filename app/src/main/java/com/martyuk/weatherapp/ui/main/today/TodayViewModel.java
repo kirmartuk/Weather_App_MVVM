@@ -11,7 +11,9 @@ import androidx.lifecycle.MutableLiveData;
 import com.martyuk.weatherapp.Passwords;
 import com.martyuk.weatherapp.entities.TodayModel;
 import com.martyuk.weatherapp.entities.WeatherHourlyModel;
+import com.martyuk.weatherapp.ui.main.network.IpRepository;
 import com.martyuk.weatherapp.ui.main.network.WeatherData;
+import com.martyuk.weatherapp.ui.main.network.pojo.IpPOJO;
 import com.martyuk.weatherapp.ui.main.network.pojo.TodayWeatherDataPOJO;
 import com.martyuk.weatherapp.ui.main.network.WeatherRepository;
 
@@ -25,19 +27,23 @@ import java.util.TimeZone;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.martyuk.weatherapp.MainActivity.units;
 import static com.martyuk.weatherapp.Utils.getImageRes;
+import static com.martyuk.weatherapp.Utils.getSystemLanguage;
+import static com.martyuk.weatherapp.Utils.getRetrofit;
 
 
 public class TodayViewModel extends AndroidViewModel {
-    MutableLiveData<TodayModel> today = new MutableLiveData<TodayModel>();
-    MutableLiveData<Boolean> progressBar = new MutableLiveData<>();
+    private MutableLiveData<TodayModel> today = new MutableLiveData<TodayModel>();
+    private MutableLiveData<Boolean> progress = new MutableLiveData<>();
 
     public TodayViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    public LiveData<Boolean> getProgress() {
+        return progress;
     }
 
     public void setModel(TodayModel model) {
@@ -77,48 +83,70 @@ public class TodayViewModel extends AndroidViewModel {
      * load today current weather and hourly forecast from openweathermap.org
      */
     public void loadCurrentWeather() {
-        progressBar.setValue(true);
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(WeatherRepository.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        WeatherRepository weatherRepository = retrofit.create(WeatherRepository.class);
-        weatherRepository.loadTodayWeather(56.045279f, 92.969643f, units, Passwords.WEATHER_PASSWORD)
-                .enqueue(new Callback<TodayWeatherDataPOJO>() {
+        progress.setValue(true);
+        //get lat and lon from ip use system locale
+        getRetrofit(IpRepository.BASE_URL)
+                .create(IpRepository.class)
+                .getIpData(getSystemLanguage())
+                .enqueue(new Callback<IpPOJO>() {
                     @Override
-                    public void onResponse(@NonNull Call<TodayWeatherDataPOJO> call, @NonNull Response<TodayWeatherDataPOJO> response) {
-                        TodayWeatherDataPOJO currentWeather = response.body();
-                        DateFormat dateFormat = new SimpleDateFormat("MM/dd HH:mm");
-                        Calendar cal = Calendar.getInstance();
+                    public void onResponse(Call<IpPOJO> call, Response<IpPOJO> response) {
+                        IpPOJO latLonData = response.body();
+                        WeatherRepository weatherRepository = getRetrofit(WeatherRepository.BASE_URL)
+                                .create(WeatherRepository.class);
 
-                        assert currentWeather != null;
-                        cal.setTimeInMillis(currentWeather.getCurrent().getDt() * 1000L);
-                        cal.setTimeZone(TimeZone.getTimeZone(currentWeather.getTimezone()));
+                        weatherRepository
+                                .loadTodayWeather(
+                                        latLonData.getLat(),
+                                        latLonData.getLon(),
+                                        units,
+                                        Passwords.WEATHER_PASSWORD,
+                                        getSystemLanguage())
+                                .enqueue(new Callback<TodayWeatherDataPOJO>() {
+                                    @Override
+                                    public void onResponse(@NonNull Call<TodayWeatherDataPOJO> call,
+                                                           @NonNull Response<TodayWeatherDataPOJO> response) {
+                                        TodayWeatherDataPOJO currentWeather = response.body();
+                                        DateFormat dateFormat = new SimpleDateFormat("MM/dd HH:mm");
+                                        Calendar cal = Calendar.getInstance();
 
-                        WeatherData weatherData = currentWeather.getCurrent();
-                        assert weatherData != null;
-                        TodayModel receivedTodayModel = new TodayModel(
-                                dateFormat.format(cal.getTime()),
-                                (int) weatherData.getTemp(),
-                                getImageRes(
-                                        getApplication().getApplicationContext(),
-                                        "ic_" + weatherData.getWeather().get(0).getIcon()
-                                ),
-                                (int) weatherData.getFeels_like(),
-                                loadTodayHourly(currentWeather, cal.get(Calendar.HOUR_OF_DAY))
-                        );
+                                        assert currentWeather != null;
+                                        cal.setTimeInMillis(currentWeather.getCurrent().getDt() * 1000L);
+                                        cal.setTimeZone(TimeZone.getTimeZone(currentWeather.getTimezone()));
 
-                        today.postValue(receivedTodayModel);
-                        progressBar.postValue(false);
+                                        WeatherData weatherData = currentWeather.getCurrent();
+                                        assert weatherData != null;
+                                        TodayModel receivedTodayModel = new TodayModel(
+                                                dateFormat.format(cal.getTime()),
+                                                (int) weatherData.getTemp(),
+                                                getImageRes(
+                                                        getApplication().getApplicationContext(),
+                                                        "ic_" + weatherData.getWeather().get(0).getIcon()
+                                                ),
+                                                (int) weatherData.getFeels_like(),
+                                                loadTodayHourly(currentWeather, cal.get(Calendar.HOUR_OF_DAY)),
+                                                weatherData.getWeather().get(0).getDescription()
+                                        );
+
+                                        today.postValue(receivedTodayModel);
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<TodayWeatherDataPOJO> call, Throwable t) {
+                                        Log.e("error", t.toString());
+                                        progress.setValue(false);
+
+                                    }
+                                });
                     }
 
                     @Override
-                    public void onFailure(Call<TodayWeatherDataPOJO> call, Throwable t) {
-                        Log.e("error", t.toString());
-                        progressBar.postValue(false);
+                    public void onFailure(Call<IpPOJO> call, Throwable t) {
+                        progress.setValue(false);
 
                     }
                 });
+
     }
 
 }
