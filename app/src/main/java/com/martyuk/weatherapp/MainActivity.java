@@ -1,19 +1,18 @@
 package com.martyuk.weatherapp;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
+import android.util.Log;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.martyuk.weatherapp.ui.main.SectionsPagerAdapter;
 import com.martyuk.weatherapp.ui.main.today.TodayViewModel;
@@ -31,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
     TabLayout tabs;
     @BindView(R.id.button_switch_sign)
     Button switcher;
+    @BindView(R.id.title)
+    TextView title;
 
     public static String units = "metric";
 
@@ -43,6 +44,13 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(sectionsPagerAdapter);
         viewPager.setOffscreenPageLimit(3);
         tabs.setupWithViewPager(viewPager);
+
+        MainViewModel mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        mainViewModel.getCity().observe(this, city -> {
+            title.setText(city);
+            Log.e("mainActivity", city);
+        });
+
 
         switcher.setText("°C");
         switcher.setOnClickListener(v -> {
