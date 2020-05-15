@@ -6,13 +6,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.martyuk.weatherapp.MainViewModel;
 import com.martyuk.weatherapp.R;
 
 import butterknife.BindView;
@@ -27,8 +28,8 @@ public class WeekFragment extends Fragment {
 
     @BindView(R.id.week_fragment_forecast)
     ListView weekListView;
-    @BindView(R.id.week_progressBar)
-    ProgressBar progressBar;
+    @BindView(R.id.week)
+    SwipeRefreshLayout swipeRefreshLayout;
 
     private WeekWeatherAdapter adapter;
 
@@ -38,18 +39,21 @@ public class WeekFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_week, container, false);
         ButterKnife.bind(this, root);
         WeekViewModel weekViewModel = ViewModelProviders.of(getActivity()).get(WeekViewModel.class);
-        weekViewModel.progressBar.observe(getViewLifecycleOwner(), progress -> {
-            if (progress) {
-                progressBar.setVisibility(View.VISIBLE);
-            } else {
-                progressBar.setVisibility(View.GONE);
-            }
-        });
+
+        swipeRefreshLayout.setOnRefreshListener(weekViewModel::loadWeekWeather);
+
+        weekViewModel.getProgress().observe(getViewLifecycleOwner(),
+                progress -> swipeRefreshLayout.setRefreshing(progress));
+
         weekViewModel.getDailyWeather().observe(getViewLifecycleOwner(), daily -> {
             Log.e("daily", daily.toString());
             adapter = new WeekWeatherAdapter(getContext(), daily.getDaily(), daily.getTimeStamp());
             weekListView.setAdapter(adapter);
+            swipeRefreshLayout.setRefreshing(false);
 
+            //update city name
+            MainViewModel mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+            mainViewModel.loadCity();
         });
 
         return root;
