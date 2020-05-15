@@ -13,6 +13,7 @@
 
         <TextView
             android:id="@+id/week_item_day"
+            android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="15sp" />
