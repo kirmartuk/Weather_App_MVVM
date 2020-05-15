@@ -1,5 +1,6 @@
 package com.martyuk.weatherapp.ui.main.network;
 
+import com.martyuk.weatherapp.Utils;
 import com.martyuk.weatherapp.ui.main.network.pojo.TodayWeatherDataPOJO;
 import com.martyuk.weatherapp.ui.main.network.pojo.TomorrowWeatherDataPOJO;
 import com.martyuk.weatherapp.ui.main.network.pojo.WeekWeatherDataPOJO;
@@ -16,19 +17,22 @@ public interface WeatherRepository {
             @Query("lat") float lat,
             @Query("lon") float lon,
             @Query("units") String units,
-            @Query("appid") String key);
+            @Query("appid") String key,
+            @Query("lang") String lang);
 
     @GET("data/2.5/onecall?exclude=current")
     Call<TomorrowWeatherDataPOJO> loadTomorrowWeather(
             @Query("lat") float lat,
             @Query("lon") float lon,
             @Query("units") String units,
-            @Query("appid") String key);
+            @Query("appid") String key,
+            @Query("lang") String lang);
 
     @GET("data/2.5/onecall?exclude=current,hourly")
     Call<WeekWeatherDataPOJO> loadWeekWeather(
             @Query("lat") float lat,
             @Query("lon") float lon,
             @Query("units") String units,
-            @Query("appid") String key);
+            @Query("appid") String key,
+            @Query("lang") String lang);
 }
