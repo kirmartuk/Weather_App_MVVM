@@ -1,18 +1,18 @@
 package com.martyuk.weatherapp.ui.main.tomorrow;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.martyuk.weatherapp.MainActivity;
 import com.martyuk.weatherapp.Passwords;
 import com.martyuk.weatherapp.entities.TomorrowModel;
 import com.martyuk.weatherapp.entities.WeatherHourlyModel;
+import com.martyuk.weatherapp.ui.main.network.IpRepository;
 import com.martyuk.weatherapp.ui.main.network.WeatherRepository;
+import com.martyuk.weatherapp.ui.main.network.pojo.IpPOJO;
 import com.martyuk.weatherapp.ui.main.network.pojo.TomorrowWeatherDataPOJO;
 
 import java.text.DateFormat;
@@ -25,15 +25,15 @@ import java.util.TimeZone;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.martyuk.weatherapp.MainActivity.units;
 import static com.martyuk.weatherapp.Utils.getImageRes;
+import static com.martyuk.weatherapp.Utils.getSystemLanguage;
+import static com.martyuk.weatherapp.Utils.getRetrofit;
 
 public class TomorrowViewModel extends AndroidViewModel {
     private MutableLiveData<TomorrowModel> tomorrow = new MutableLiveData<>();
-    MutableLiveData<Boolean> progressBar = new MutableLiveData<>();
+    private MutableLiveData<Boolean> progress = new MutableLiveData<>();
 
     public TomorrowViewModel(@NonNull Application application) {
         super(application);
@@ -42,6 +42,10 @@ public class TomorrowViewModel extends AndroidViewModel {
     public LiveData<TomorrowModel> getTomorrow() {
         loadTomorrowWeather();
         return tomorrow;
+    }
+
+    public LiveData<Boolean> getProgress() {
+        return progress;
     }
 
     private List<WeatherHourlyModel> loadTomorrowHourly(TomorrowWeatherDataPOJO data) {
@@ -67,43 +71,61 @@ public class TomorrowViewModel extends AndroidViewModel {
     }
 
     public void loadTomorrowWeather() {
-        progressBar.postValue(true);
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(WeatherRepository.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        WeatherRepository weatherRepository = retrofit.create(WeatherRepository.class);
-        weatherRepository.loadTomorrowWeather(56.045279f, 92.969643f, units, Passwords.WEATHER_PASSWORD)
-                .enqueue(new Callback<TomorrowWeatherDataPOJO>() {
+        progress.setValue(true);
+        //get lat and lon from ip use system locale
+        getRetrofit(IpRepository.BASE_URL)
+                .create(IpRepository.class)
+                .getIpData(getSystemLanguage())
+                .enqueue(new Callback<IpPOJO>() {
                     @Override
-                    public void onResponse(Call<TomorrowWeatherDataPOJO> call, Response<TomorrowWeatherDataPOJO> response) {
-                        TomorrowWeatherDataPOJO pojo = response.body();
-                        Log.e("tomorrow_pojo", pojo.toString());
-                        DateFormat dateFormat = new SimpleDateFormat("MM/dd");
-                        Calendar cal = Calendar.getInstance();
-                        assert pojo != null;
-                        cal.setTimeInMillis(pojo.getDaily().get(1).getDt() * 1000L);
-                        cal.setTimeZone(TimeZone.getTimeZone(pojo.getTimezone()));
+                    public void onResponse(Call<IpPOJO> call, Response<IpPOJO> response) {
+                        IpPOJO latLonData = response.body();
+                        WeatherRepository weatherRepository = getRetrofit(WeatherRepository.BASE_URL)
+                                .create(WeatherRepository.class);
+                        weatherRepository
+                                .loadTomorrowWeather(
+                                        latLonData.getLat(),
+                                        latLonData.getLon(),
+                                        units,
+                                        Passwords.WEATHER_PASSWORD,
+                                        getSystemLanguage())
+                                .enqueue(new Callback<TomorrowWeatherDataPOJO>() {
+                                    @Override
+                                    public void onResponse(Call<TomorrowWeatherDataPOJO> call,
+                                                           Response<TomorrowWeatherDataPOJO> response) {
+                                        TomorrowWeatherDataPOJO pojo = response.body();
+                                        DateFormat dateFormat = new SimpleDateFormat("MM/dd");
+                                        Calendar cal = Calendar.getInstance();
+                                        cal.setTimeInMillis(pojo.getDaily().get(1).getDt() * 1000L);
+                                        cal.setTimeZone(TimeZone.getTimeZone(pojo.getTimezone()));
 
+                                        TomorrowModel model = new TomorrowModel(
+                                                dateFormat.format(cal.getTime()),
+                                                (int) pojo.getDaily().get(1).getTemp().getMax(),
+                                                (int) pojo.getDaily().get(1).getTemp().getMin(),
+                                                getImageRes(
+                                                        getApplication().getBaseContext(),
+                                                        "ic_" + pojo.getDaily().get(1).getWeather().get(0).getIcon()
+                                                ),
+                                                loadTomorrowHourly(pojo),
+                                                pojo.getDaily().get(1).getWeather().get(0).getDescription()
+                                        );
+                                        tomorrow.setValue(model);
+                                    }
 
-                        TomorrowModel model = new TomorrowModel(
-                                dateFormat.format(cal.getTime()),
-                                (int) pojo.getDaily().get(1).getTemp().getMax(),
-                                (int) pojo.getDaily().get(1).getTemp().getMin(),
-                                getImageRes(
-                                        getApplication().getBaseContext(),
-                                        "ic_" + pojo.getDaily().get(1).getWeather().get(0).getIcon()
-                                ),
-                                loadTomorrowHourly(pojo)
-                        );
-                        tomorrow.setValue(model);
-                        progressBar.postValue(false);
+                                    @Override
+                                    public void onFailure(Call<TomorrowWeatherDataPOJO> call, Throwable t) {
+                                        progress.setValue(false);
+                                    }
+                                });
                     }
 
                     @Override
-                    public void onFailure(Call<TomorrowWeatherDataPOJO> call, Throwable t) {
-
+                    public void onFailure(Call<IpPOJO> call, Throwable t) {
+                        progress.setValue(false);
                     }
                 });
+
+
     }
 }

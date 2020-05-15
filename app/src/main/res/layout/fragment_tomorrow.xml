@@ -1,103 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/tomorrow"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/image_part_002"
     android:orientation="vertical">
 
-    <ProgressBar
-        android:id="@+id/tomorrow_progressBar"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:visibility="visible"
-        android:layout_centerHorizontal="true"/>
-
-    <TextView
-        android:id="@+id/fragment_tomorrow_timeUpdate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="10dp"
-        android:textColor="@color/black"
-        app:autoSizeTextType="uniform" />
-
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@drawable/image_part_002"
+        android:orientation="vertical">
 
-        android:layout_below="@id/fragment_tomorrow_timeUpdate">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/fragment_tomorrow_timeUpdate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="right"
-            android:layout_margin="10dp"
-            android:orientation="vertical">
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/black"
+            app:autoSizeTextType="uniform" />
 
-
-            <LinearLayout
-                android:id="@+id/max_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/fragment_tomorrow_max"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:textSize="40sp"
-                    app:autoSizeTextType="uniform" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_toRightOf="@id/fragment_tomorrow_max"
-                    android:background="@drawable/ic_arrow_upward_black_24dp" />
-            </LinearLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/fragment_tomorrow_timeUpdate">
 
             <LinearLayout
-                android:id="@+id/min_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/max_layout">
+                android:layout_margin="10dp"
+                android:gravity="right"
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/fragment_tomorrow_min"
+
+                <LinearLayout
+                    android:id="@+id/max_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/fragment_tomorrow_max"
-                    android:textColor="@color/white"
-                    android:textSize="40sp"
-                    app:autoSizeTextType="uniform" />
+                    android:orientation="horizontal">
 
-                <ImageView
+                    <TextView
+                        android:id="@+id/fragment_tomorrow_max"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="40sp"
+                        app:autoSizeTextType="uniform" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_toRightOf="@id/fragment_tomorrow_max"
+                        android:background="@drawable/ic_arrow_upward_black_24dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/min_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_toRightOf="@id/fragment_tomorrow_min"
-                    android:background="@drawable/ic_arrow_downward_black_24dp" />
+                    android:layout_below="@id/max_layout">
+
+                    <TextView
+                        android:id="@+id/fragment_tomorrow_min"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/fragment_tomorrow_max"
+                        android:textColor="@color/white"
+                        android:textSize="40sp"
+                        app:autoSizeTextType="uniform" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_toRightOf="@id/fragment_tomorrow_min"
+                        android:background="@drawable/ic_arrow_downward_black_24dp" />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
 
 
-        <ImageView
-            android:id="@+id/fragment_tomorrow_image"
-            android:layout_width="110dp"
-            android:layout_height="110dp"
-            android:layout_alignParentRight="true"
-            android:layout_margin="10dp" />
+            <ImageView
+                android:id="@+id/fragment_tomorrow_image"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dp" />
 
+            <TextView
+                android:id="@+id/fragment_tomorrow_description"
+                android:layout_width="110dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/fragment_tomorrow_image"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dp"
+                android:gravity="center_horizontal"
+                android:textColor="@color/white"
+                android:textSize="15sp" />
+
+        </RelativeLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/fragment_tomorrow_hourly"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@color/white_transparent" />
     </RelativeLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/fragment_tomorrow_hourly"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@color/white_transparent" />
-</RelativeLayout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

@@ -5,24 +5,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.martyuk.weatherapp.MainViewModel;
 import com.martyuk.weatherapp.R;
 import com.martyuk.weatherapp.WeatherHourlyRecyclerViewAdapter;
-import com.martyuk.weatherapp.ui.main.today.TodayViewModel;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,8 +40,10 @@ public class TomorrowFragment extends Fragment {
     TextView min;
     @BindView(R.id.fragment_tomorrow_timeUpdate)
     TextView date;
-    @BindView(R.id.tomorrow_progressBar)
-    ProgressBar progressBar;
+    @BindView(R.id.fragment_tomorrow_description)
+    TextView description;
+    @BindView(R.id.tomorrow)
+    SwipeRefreshLayout swipeRefreshLayout;
 
     private WeatherHourlyRecyclerViewAdapter adapter;
 
@@ -54,19 +53,19 @@ public class TomorrowFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_tomorrow, container, false);
         ButterKnife.bind(this, root);
         TomorrowViewModel tomorrowView = ViewModelProviders.of(getActivity()).get(TomorrowViewModel.class);
-        tomorrowView.progressBar.observe(getViewLifecycleOwner(), progress -> {
-            if (progress) {
-                progressBar.setVisibility(View.VISIBLE);
-            }else {
-                progressBar.setVisibility(View.GONE);
-            }
-        });
+
+        swipeRefreshLayout.setOnRefreshListener(tomorrowView::loadTomorrowWeather);
+
+        tomorrowView.getProgress().observe(getViewLifecycleOwner(),
+                progress -> swipeRefreshLayout.setRefreshing(progress));
+
         tomorrowView.getTomorrow().observe(getViewLifecycleOwner(), tomorrowModel -> {
             Log.e("tomorrow", tomorrowModel.toString());
             image.setImageResource(tomorrowModel.getImageResource());
             max.setText(String.valueOf(tomorrowModel.getMax()));
             min.setText(String.valueOf(tomorrowModel.getMin()));
             date.setText(tomorrowModel.getTimeStamp());
+            description.setText(tomorrowModel.getDescription());
 
             adapter = new WeatherHourlyRecyclerViewAdapter(tomorrowModel.getHourly());
             LinearLayoutManager mLayoutManager = new LinearLayoutManager(root.getContext());
@@ -74,6 +73,11 @@ public class TomorrowFragment extends Fragment {
             hourly.setLayoutManager(mLayoutManager);
             hourly.setItemAnimator(new DefaultItemAnimator());
             hourly.setAdapter(adapter);
+            swipeRefreshLayout.setRefreshing(false);
+
+            //update city name
+            MainViewModel mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+            mainViewModel.loadCity();
         });
 
 

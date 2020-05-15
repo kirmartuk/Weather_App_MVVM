@@ -4,12 +4,12 @@ import java.util.List;
 
 
 public class TodayModel {
-    String timeStamp;
-    int temperature;
-    int imageResource;
-    int feelsLike;
-    List<WeatherHourlyModel> hourly;
-    String description;
+    private String timeStamp;
+    private int temperature;
+    private int imageResource;
+    private int feelsLike;
+    private List<WeatherHourlyModel> hourly;
+    private String description;
 
     public List<WeatherHourlyModel> getHourly() {
         return hourly;
