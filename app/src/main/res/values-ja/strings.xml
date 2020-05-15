@@ -1,0 +1,6 @@
+<resources>    <string name="app_name">WeatherApp</string>
+    <string name="tab_text_1">今日</string>
+    <string name="tab_text_2">明日</string>
+    <string name="tab_text_3">10日間</string>
+    <string name="feels_like">のように感じている</string>
+</resources>

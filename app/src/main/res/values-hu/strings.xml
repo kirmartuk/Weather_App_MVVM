@@ -1,0 +1,6 @@
+<resources>    <string name="app_name">WeatherApp</string>
+    <string name="tab_text_1">Ma</string>
+    <string name="tab_text_2">Holnap</string>
+    <string name="tab_text_3">10 nap</string>
+    <string name="feels_like">Olyan, mintha</string>
+</resources>

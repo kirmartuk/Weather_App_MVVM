@@ -1,0 +1,6 @@
+<resources>    <string name="app_name">ВеатхерАпп</string>
+    <string name="tab_text_1">Данас</string>
+    <string name="tab_text_2">Сутра</string>
+    <string name="tab_text_3">10 дана</string>
+    <string name="feels_like">осећа као</string>
+</resources>

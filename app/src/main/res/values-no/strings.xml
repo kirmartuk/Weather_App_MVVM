@@ -1,0 +1,6 @@
+<resources>    <string name="app_name">WeatherApp</string>
+    <string name="tab_text_1">I dag</string>
+    <string name="tab_text_2">I morgen</string>
+    <string name="tab_text_3">10 dager</string>
+    <string name="feels_like">føles som</string>
+</resources>
