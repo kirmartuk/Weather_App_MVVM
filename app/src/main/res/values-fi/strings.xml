@@ -1,6 +1,6 @@
-<resources>    <string name="app_name">WeatherApp</string>
+<resources>    <string name="app_name">sää</string>
     <string name="tab_text_1">Tänään</string>
     <string name="tab_text_2">Huomenna</string>
-    <string name="tab_text_3">10 päivää</string>
+    <string name="tab_text_3">7 päivää</string>
     <string name="feels_like">tuntuu siltä</string>
 </resources>
