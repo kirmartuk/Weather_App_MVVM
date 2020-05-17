@@ -1,10 +1,12 @@
 package com.martyuk.weatherapp;
 
+import android.Manifest;
 import android.content.res.Resources;
 import android.os.Bundle;
 
 import com.google.android.material.tabs.TabLayout;
 
+import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
@@ -44,14 +46,16 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(sectionsPagerAdapter);
         viewPager.setOffscreenPageLimit(3);
         tabs.setupWithViewPager(viewPager);
+        //access permission
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                0);
 
         MainViewModel mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         mainViewModel.getCity().observe(this, city -> {
             title.setText(city);
             Log.e("mainActivity", city);
         });
-
-
+        
         switcher.setText("°C");
         switcher.setOnClickListener(v -> {
             String sign = (units.equals("metric")) ? "°F" : "°C";
@@ -66,4 +70,5 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
 }
