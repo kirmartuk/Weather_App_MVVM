@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
             title.setText(city);
             Log.e("mainActivity", city);
         });
-        
+
         switcher.setText("°C");
         switcher.setOnClickListener(v -> {
             String sign = (units.equals("metric")) ? "°F" : "°C";

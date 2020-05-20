@@ -8,7 +8,9 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -18,6 +20,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.martyuk.weatherapp.ui.main.network.IpRepository;
 import com.martyuk.weatherapp.ui.main.network.pojo.IpPOJO;
@@ -30,13 +33,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static androidx.core.content.ContextCompat.getSystemService;
+import static com.martyuk.weatherapp.Utils.checkLocation;
 import static com.martyuk.weatherapp.Utils.getRetrofit;
 import static com.martyuk.weatherapp.Utils.getSystemLanguage;
 
 public class MainViewModel extends AndroidViewModel {
     private MutableLiveData<String> city = new MutableLiveData<>();
-
+    private LocationManager locationManager;
 
     public MainViewModel(@NonNull Application application) {
         super(application);
@@ -51,26 +54,10 @@ public class MainViewModel extends AndroidViewModel {
         this.city.setValue(city);
     }
 
+    @SuppressLint("MissingPermission")
     public void loadCityByLatLon() {
-        LocationManager lm = (LocationManager) getApplication().getSystemService(Context.LOCATION_SERVICE);
-        @SuppressLint("MissingPermission")
-        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        Geocoder geocoder = new Geocoder(getApplication(), Locale.getDefault());
-        List<Address> addresses = null;
-        try {
-            addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        assert addresses != null;
-        String cityName = (addresses.get(0).getLocality() == null)
-                ? addresses.get(0).getPostalCode()
-                : addresses.get(0).getLocality();
-        if (cityName == null) {
-            city.setValue("—");
-        } else {
-            city.setValue(cityName);
-        }
+        locationManager = (LocationManager) getApplication().getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, locationListener, null);
     }
 
     public void loadCityByIp() {
@@ -91,13 +78,54 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public void loadCity() {
-        if (ActivityCompat.checkSelfPermission(getApplication(),
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(getApplication(),
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            loadCityByIp();
-        } else {
+        locationManager = (LocationManager) getApplication().getSystemService(Context.LOCATION_SERVICE);
+        assert locationManager != null;
+        //Log.e("lm", String.valueOf(locationManager.isLocationEnabled()));
+        if (checkLocation(getApplication())) {
             loadCityByLatLon();
+        } else {
+            loadCityByIp();
         }
     }
+
+    private LocationListener locationListener = new LocationListener() {
+
+        @Override
+        public void onLocationChanged(Location location) {
+            Geocoder geocoder = new Geocoder(getApplication(), Locale.getDefault());
+            List<Address> addresses = null;
+            try {
+                addresses = geocoder.getFromLocation(location.getLatitude(),
+                        location.getLongitude(), 1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            assert addresses != null;
+            String cityName = (addresses.get(0).getLocality() == null)
+                    ? addresses.get(0).getPostalCode()
+                    : addresses.get(0).getLocality();
+            if (cityName == null) {
+                city.setValue("—");
+            } else {
+                city.setValue(cityName);
+            }
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+    };
+
 }
+
