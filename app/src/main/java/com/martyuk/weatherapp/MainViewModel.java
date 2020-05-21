@@ -50,17 +50,19 @@ public class MainViewModel extends AndroidViewModel {
 
     @SuppressLint("MissingPermission")
     public void loadCityByLatLon() {
+        Log.e("load_way", "lat lon");
         locationManager = (LocationManager) getApplication().getSystemService(Context.LOCATION_SERVICE);
-        assert locationManager != null;
-        if (locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) != null) {
-            loadCityByLocation(locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER));
-        } else {
+        if (locationManager != null) {
             locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, locationListener, null);
+        } else {
+            loadCityByIp();
         }
+
 
     }
 
     public void loadCityByIp() {
+        Log.e("load_way", "ip");
         IpRepository ipRepository = getRetrofit(IpRepository.BASE_URL).create(IpRepository.class);
         ipRepository.getIpData(getSystemLanguage()).enqueue(new Callback<IpPOJO>() {
             @Override
@@ -91,6 +93,7 @@ public class MainViewModel extends AndroidViewModel {
 
         @Override
         public void onLocationChanged(Location location) {
+            Log.e("location", location.toString());
             loadCityByLocation(location);
         }
 
@@ -112,7 +115,6 @@ public class MainViewModel extends AndroidViewModel {
 
     private void loadCityByLocation(Location location) {
         Geocoder geocoder = new Geocoder(getApplication(), Locale.getDefault());
-
         List<Address> addresses = null;
         try {
             addresses = geocoder.getFromLocation(location.getLatitude(),
