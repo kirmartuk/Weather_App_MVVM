@@ -1,10 +1,8 @@
 package com.martyuk.weatherapp;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -14,14 +12,10 @@ import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.martyuk.weatherapp.ui.main.network.IpRepository;
 import com.martyuk.weatherapp.ui.main.network.pojo.IpPOJO;
 
@@ -57,7 +51,13 @@ public class MainViewModel extends AndroidViewModel {
     @SuppressLint("MissingPermission")
     public void loadCityByLatLon() {
         locationManager = (LocationManager) getApplication().getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, locationListener, null);
+        assert locationManager != null;
+        if (locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) != null) {
+            loadCityByLocation(locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER));
+        } else {
+            locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, locationListener, null);
+        }
+
     }
 
     public void loadCityByIp() {
@@ -80,7 +80,6 @@ public class MainViewModel extends AndroidViewModel {
     public void loadCity() {
         locationManager = (LocationManager) getApplication().getSystemService(Context.LOCATION_SERVICE);
         assert locationManager != null;
-        //Log.e("lm", String.valueOf(locationManager.isLocationEnabled()));
         if (checkLocation(getApplication())) {
             loadCityByLatLon();
         } else {
@@ -92,23 +91,7 @@ public class MainViewModel extends AndroidViewModel {
 
         @Override
         public void onLocationChanged(Location location) {
-            Geocoder geocoder = new Geocoder(getApplication(), Locale.getDefault());
-            List<Address> addresses = null;
-            try {
-                addresses = geocoder.getFromLocation(location.getLatitude(),
-                        location.getLongitude(), 1);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            assert addresses != null;
-            String cityName = (addresses.get(0).getLocality() == null)
-                    ? addresses.get(0).getPostalCode()
-                    : addresses.get(0).getLocality();
-            if (cityName == null) {
-                city.setValue("—");
-            } else {
-                city.setValue(cityName);
-            }
+            loadCityByLocation(location);
         }
 
         @Override
@@ -126,6 +109,32 @@ public class MainViewModel extends AndroidViewModel {
 
         }
     };
+
+    private void loadCityByLocation(Location location) {
+        Geocoder geocoder = new Geocoder(getApplication(), Locale.getDefault());
+
+        List<Address> addresses = null;
+        try {
+            addresses = geocoder.getFromLocation(location.getLatitude(),
+                    location.getLongitude(), 2);
+        } catch (IOException e) {
+            e.printStackTrace();
+            loadCityByIp();
+            return;
+        }
+        String cityName = null;
+        assert addresses != null;
+        if (!addresses.isEmpty()) {
+            cityName = (addresses.get(0).getLocality() == null)
+                    ? addresses.get(0).getPostalCode()
+                    : addresses.get(0).getLocality();
+        }
+        if (cityName == null) {
+            loadCityByIp();
+        } else {
+            city.setValue(cityName);
+        }
+    }
 
 }
 

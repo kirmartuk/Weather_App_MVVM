@@ -34,7 +34,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static android.content.Context.CONNECTIVITY_SERVICE;
 import static com.martyuk.weatherapp.MainActivity.units;
 import static com.martyuk.weatherapp.Utils.checkLocation;
 import static com.martyuk.weatherapp.Utils.getImageRes;
