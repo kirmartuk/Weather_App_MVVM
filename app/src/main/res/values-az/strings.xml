@@ -1,6 +1,6 @@
-<resources>    <string name="app_name">WeatherApp</string>
+<resources>    <string name="app_name">hava</string>
     <string name="tab_text_1">hazırda</string>
     <string name="tab_text_2">sabah</string>
-    <string name="tab_text_3">10 gün</string>
+    <string name="tab_text_3">7 gün</string>
     <string name="feels_like">kimi hiss</string>
 </resources>

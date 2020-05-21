@@ -1,6 +1,6 @@
-<resources>    <string name="app_name">WeatherApp</string>
+<resources>    <string name="app_name">vreme</string>
     <string name="tab_text_1">danes</string>
     <string name="tab_text_2">jutri</string>
-    <string name="tab_text_3">10 dni</string>
+    <string name="tab_text_3">7 dni</string>
     <string name="feels_like">čuti se kot</string>
 </resources>

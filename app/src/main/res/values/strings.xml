@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">WeatherApp</string>
+    <string name="app_name">Weather</string>
     <string name="tab_text_1">Today</string>
     <string name="tab_text_2">Tomorrow</string>
-    <string name="tab_text_3">10 days</string>
+    <string name="tab_text_3">7 days</string>
     <string name="feels_like">feels like</string>
 </resources>

@@ -1,6 +1,6 @@
-<resources>    <string name="app_name">WeatherApp</string>
+<resources>    <string name="app_name">vreme</string>
     <string name="tab_text_1">Astăzi</string>
     <string name="tab_text_2">Mâine</string>
-    <string name="tab_text_3">10 zile</string>
+    <string name="tab_text_3">7 zile</string>
     <string name="feels_like">se simte ca</string>
 </resources>

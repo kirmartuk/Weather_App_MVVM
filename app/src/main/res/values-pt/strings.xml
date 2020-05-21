@@ -1,6 +1,6 @@
-<resources>    <string name="app_name">WeatherApp</string>
+<resources>    <string name="app_name">clima</string>
     <string name="tab_text_1">Hoje</string>
     <string name="tab_text_2">Amanhã</string>
-    <string name="tab_text_3">10 dias</string>
+    <string name="tab_text_3">7 dias</string>
     <string name="feels_like">parece</string>
 </resources>

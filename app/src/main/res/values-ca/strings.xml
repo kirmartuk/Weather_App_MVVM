@@ -1,6 +1,6 @@
-<resources>    <string name="app_name">WeatherApp</string>
+<resources>    <string name="app_name">temps</string>
     <string name="tab_text_1">avui</string>
     <string name="tab_text_2">Demà</string>
-    <string name="tab_text_3">10 dies</string>
+    <string name="tab_text_3">7 dies</string>
     <string name="feels_like">se sent com</string>
 </resources>

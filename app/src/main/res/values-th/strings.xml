@@ -1,6 +1,6 @@
-<resources>    <string name="app_name">WeatherApp</string>
+<resources>    <string name="app_name">สภาพอากาศ</string>
     <string name="tab_text_1">ในวันนี้</string>
     <string name="tab_text_2">วันพรุ่งนี้</string>
-    <string name="tab_text_3">10 วัน</string>
+    <string name="tab_text_3">7 วัน</string>
     <string name="feels_like">รู้สึกเหมือน</string>
 </resources>
